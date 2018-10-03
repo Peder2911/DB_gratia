@@ -1,0 +1,14 @@
+Package: DBgratia
+Title: Functions that improves handling of big data with redis (redux)
+Version: 0.0.0.9000
+Authors@R: person("Peder", "Landsverk", email = "pglandsverk@gmail.com", role = c("aut", "cre"))
+Description: Various functions that allow for processing of large datasets stored as lists of csv-formatted rows in redis.
+Depends: R (>= 3.4.4)
+License: GPL 
+Encoding: UTF-8
+LazyData: true
+Imports:
+	glue,
+	redux,
+	magrittr
+RoxygenNote: 6.1.0.9000
