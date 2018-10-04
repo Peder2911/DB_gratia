@@ -45,7 +45,6 @@ redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE, ...){
 
 		data <- DBgratia::readCsvVector(dvec)
 
-
 		# manipulate the ###
 		# data #############
 
@@ -63,8 +62,10 @@ redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE, ...){
 		dvec <- DBgratia::dfToVector(data)[-1]
 		DBgratia::redisPut(dvec,redis,tokey)
 
-		writeLines('wrote to redis',stderr())
-
+		if(verbose){
+			writeLines(paste('wrote',length(dvec),'lines to redis'),
+				   stderr())
+			}
 		}
 
 	# key that holds new data ##

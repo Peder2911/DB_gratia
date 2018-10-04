@@ -11,7 +11,7 @@ This function reads a dataset from a character vector, where each
 value is a row in csv-format.
 }
 \details{
-NOTE! This function uses the \n character to unserialize the data. 
+NOTE! This function uses the \\n character to unserialize the data. 
 Any newline characters in the data are substituted by the nlsub
 character.
 }
