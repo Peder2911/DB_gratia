@@ -11,7 +11,9 @@
 #' 
 
 redisPutData <- function(data,redis,key,chunksize = 100,verbose = FALSE,
-			 flushvar = TRUE){
+			 flushvar = TRUE,
+			 sanitize = FALSE,
+			 noheader = FALSE){
 	
 	if(flushvar){
 		redis$DEL(key)
@@ -20,6 +22,8 @@ redisPutData <- function(data,redis,key,chunksize = 100,verbose = FALSE,
 				   stderr())
 			}
 		}
+
+
 		
 	if(nrow(data) > chunksize){
 
@@ -44,13 +48,16 @@ redisPutData <- function(data,redis,key,chunksize = 100,verbose = FALSE,
 					}
 
 				dvec <- data[chunk,] %>%
-						DBgratia::dfToVector()
+						DBgratia::dfToVector(sanitize)
 				DBgratia::redisPut(dvec[-1],redis,key)
 				it <- it + 1
 			}
+
 		} else {
-		dvec <- DBgratia::dfToVector(data)
-		DBgratia::redisPut(dvec,key)
+
+		dvec <- DBgratia::dfToVector(data,sanitize)
+		print(dvec[1])
+		DBgratia::redisPut(dvec,redis,key)
 
 		}
 

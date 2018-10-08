@@ -5,7 +5,7 @@
 \title{Posts the data to redis, chunking it to avoid deadlocks when transforming to text.}
 \usage{
 redisPutData(data, redis, key, chunksize = 100, verbose = FALSE,
-  flushvar = TRUE)
+  flushvar = TRUE, sanitize = FALSE, noheader = FALSE)
 }
 \description{
 This function puts an entire dataset to redis, chunking the operation to avoid deadlocks 

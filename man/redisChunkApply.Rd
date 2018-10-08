@@ -4,7 +4,8 @@
 \alias{redisChunkApply}
 \title{Applies FUN to data stored in a redis database}
 \usage{
-redisChunkApply(redis, key, FUN, chunksize = 100, verbose = FALSE, ...)
+redisChunkApply(redis, key, FUN, chunksize = 100, verbose = FALSE,
+  sanitize = FALSE, ...)
 }
 \description{
 This function applies FUN to data stored in a redis database, chunking the operation if

@@ -4,7 +4,7 @@
 \alias{dfToVector}
 \title{Utility function that converts a data frame into a character vector.}
 \usage{
-dfToVector(df, ...)
+dfToVector(df, sanitize = FALSE, ...)
 }
 \description{
 This function takes a data frame, and returns csv-formatted lines in a vector.

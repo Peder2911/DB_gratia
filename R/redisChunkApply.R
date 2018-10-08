@@ -12,7 +12,7 @@
 #' processRedisData(r,'data',as.sentence.df,'body') 
 #' 
 
-redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE, ...){
+redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE,sanitize = FALSE, ...){
 
 	reapply <- function(redis,fromkey,input_colnames,
 			       FUN, verbose = FALSE,
@@ -59,7 +59,7 @@ redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE, ...){
 		# of lines, then ###
 		# put. #############
 
-		dvec <- DBgratia::dfToVector(data)[-1]
+		dvec <- DBgratia::dfToVector(data,sanitize)[-1]
 		DBgratia::redisPut(dvec,redis,tokey)
 
 		if(verbose){
@@ -78,8 +78,12 @@ redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE, ...){
 	# what are the columns after
 	# applying the function? ###
 
+	print(redis$LRANGE(key,0,1))
+
 	trial <- c(columns,redis$LRANGE(key,0,0))%>%
 		DBgratia::readCsvVector()
+
+	print('works')
 
 	newcolumns <- FUN(trial,...)%>%
 		names()
