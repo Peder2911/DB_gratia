@@ -5,18 +5,23 @@
 #' 
 #' @keywords path 
 #' @export
+#' @import redux
 #' @examples
 #' 
 #' 
 #' 
 
 redisPut <- function(data,redis,key){
-	devnull <- file('/dev/null')
-	sink(devnull)
-	sapply(data,FUN = function(line){
-		redis$RPUSH(key,line)
-		})
-	sink()
-	close(devnull)
+   redisCmds <- redux::redis
+
+   cmds <- lapply(data,function(v){
+                  redisCmds$RPUSH(key,v)
+               })
+   
+   redis$pipeline(.commands = cmds)
+
+	#sapply(data,FUN = function(line){
+	#	redis$RPUSH(key,line)
+	#	})
 	}
 

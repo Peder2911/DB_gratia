@@ -6,6 +6,7 @@
 #'
 #' @keywords bigdata 
 #' @importFrom magrittr "%>%"
+#' @import crayon
 #' @export
 #' @examples
 #' r <- redis()
@@ -29,21 +30,13 @@ redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE,saniti
 		# get max chunksize #
 		# lines. ############
 
-		lines <- DBgratia::redisGet(redis,fromkey,chunksize)
+		data <- DBgratia::redisGet(redis,fromkey,chunksize)%>%
+         DBgratia::read_lodJson()
 
 		if(verbose){
-			writeLines(paste('read',length(lines),'lines from redis'),
+			writeLines(crayon::yellow(paste('read',nrow(data),'lines from redis')),
 				   stderr())
 			}
-
-		# append expected ###
-		# column names ######
-
-		dvec <- c(input_colnames,lines)
-
-		#dvec <- c(input_colnames,DBgratia::redisGet(redis,fromkey,chunksize))
-
-		data <- DBgratia::readCsvVector(dvec)
 
 		# manipulate the ###
 		# data #############
@@ -51,7 +44,7 @@ redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE,saniti
 		data <- FUN(data, ...)
 
 		if(verbose){
-			writeLines('function successful',
+			writeLines(crayon::green('function successful'),
 				   stderr())
 			}
 
@@ -59,11 +52,11 @@ redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE,saniti
 		# of lines, then ###
 		# put. #############
 
-		dvec <- DBgratia::dfToVector(data,sanitize)[-1]
+		dvec <- DBgratia::df_to_lodJson(data)
 		DBgratia::redisPut(dvec,redis,tokey)
 
 		if(verbose){
-			writeLines(paste('wrote',length(dvec),'lines to redis'),
+			writeLines(crayon::blue(paste('wrote',length(dvec),'lines to redis')),
 				   stderr())
 			}
 		}
@@ -72,33 +65,25 @@ redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE,saniti
 	tmpkey <- paste(key,'_tmp',sep = '')
 	redis$DEL(tmpkey)
 
-	# work out the columns #####
-	columns <- redis$LPOP(key)
-
 	# what are the columns after
 	# applying the function? ###
+	#trial <- c(columns,redis$LRANGE(key,0,0))%>%
+	#	DBgratia::readCsvVector()
 
-	print(redis$LRANGE(key,0,1))
+	#newcolumns <- FUN(trial,...)%>%
+	#	names()
 
-	trial <- c(columns,redis$LRANGE(key,0,0))%>%
-		DBgratia::readCsvVector()
+	#newcolumns <- glue::glue_collapse(newcolumns,sep = ',')
 
-	print('works')
-
-	newcolumns <- FUN(trial,...)%>%
-		names()
-
-	newcolumns <- glue::glue_collapse(newcolumns,sep = ',')
-
-	if(verbose){
-		writeLines(paste('new columns:',newcolumns),
-			   stderr())
-		}
+	#if(verbose){
+	#	writeLines(paste('new columns:',newcolumns),
+	#		   stderr())
+	#	}
 
 
 	# add header to new data ###
 
-	redis$RPUSH(tmpkey,newcolumns)
+	#redis$RPUSH(tmpkey,newcolumns)
 
 	# work out chunking ########
 	# prob. a bit unnecessary ##
@@ -130,7 +115,7 @@ redisChunkApply <- function(redis,key,FUN,chunksize = 100,verbose = FALSE,saniti
 		}
 
 	# push the new data into the
-       	#  old key. ################
+   #  old key. ################
 
 	redis$RENAME(tmpkey,key)
 

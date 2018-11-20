@@ -17,46 +17,37 @@ redisPutData <- function(data,redis,key,chunksize = 100,verbose = FALSE,
 	
 	if(flushvar){
 		redis$DEL(key)
-		if(verbose){
-			writeLines(paste('flushed key:',key),
-				   stderr())
-			}
 		}
-
-
 		
 	if(nrow(data) > chunksize){
+		#header <- names(data) %>%
+		#	glue::glue_collapse(sep = ',')
 
-		if(verbose){
-			writeLines('chunking',stderr())
-			}
-
-		header <- names(data) %>%
-			glue::glue_collapse(sep = ',')
-
-		redis$RPUSH(key,header)
+		#redis$RPUSH(key,header)
 		
 		chunkIndices <- DBgratia::calculateChunks(nrow(data),chunksize)%>%
 			DBgratia::chunkIndices()
 
 		it <- 1
+      writeLines(paste('using',length(chunkIndices),'chunks'))
 		for(chunk in chunkIndices){
-
 				if(verbose){
-					writeLines(paste('working on chunk',it),
-						   stderr())
+               blit <- paste('working on chunk',it)
+               cat(blit)
 					}
 
 				dvec <- data[chunk,] %>%
-						DBgratia::dfToVector(sanitize)
+						DBgratia::df_to_lodJson()
 				DBgratia::redisPut(dvec[-1],redis,key)
+
 				it <- it + 1
-			}
+            cat(strrep('\b',str_length(blit)))
+      }
+      cat('\n')
 
-		} else {
+   } else {
 
-		dvec <- DBgratia::dfToVector(data,sanitize)
-		print(dvec[1])
+		dvec <- DBgratia::dt_to_lodJson(data)
 		DBgratia::redisPut(dvec,redis,key)
 
 		}

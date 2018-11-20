@@ -20,9 +20,9 @@ redisGet <- function(redis,key,n = NULL){
 		}
 
 	it <- 1
-	while(!is.null(ln) & it <= n){
-		ln <- redis$LPOP(key)
-		res <- c(res,ln)
+	while(!is.null(line) & it <= n){
+		line <- redis$LPOP(key)
+		res <- c(res,line)
 		it <- it + 1
 		}
 	res
