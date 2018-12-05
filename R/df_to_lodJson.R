@@ -5,18 +5,19 @@
 #' 
 #' @keywords path 
 #' @export
-#' @import reticulate
+#' @import rjson 
 #' @examples
 #' json <- df_to_lodJson(mtcars)
 #' 
 
 
 df_to_lodJson <- function(df){
-   pyjson <- reticulate::import('json')
+   #pyjson <- reticulate::import('json')
 
    apply(df,1,function(row){
       lrow <- as.list(row)
       names(lrow) <- names(df)
-      pyjson$dumps(lrow)
+
+      rjson::toJSON(lrow)
    })
 }
